@@ -1,0 +1,186 @@
+# 🎯 KỊCH BẢN DEMO WORKSHOP: HỆ THỐNG AI AGENT QUẢN LÝ GMAIL
+
+## 🔴 PHẦN 1: DEMO TRỰC TIẾP (5 phút)
+
+**[Mở ứng dụng, hiển thị bảng điều khiển]**
+
+"Xin chào mọi người! Hôm nay tôi sẽ trình diễn một hệ thống Tác nhân AI được viết bằng mã nguồn để quản lý Gmail một cách thông minh.
+
+**[Nhấp nút đồng bộ email]**
+Các bạn có thể thấy - hệ thống đang đồng bộ 500 email từ Gmail thật của tôi, xử lý theo thời gian thực với thanh tiến độ. Mỗi email được AI tự động phân loại vào 5 danh mục tiếng Việt và tóm tắt nội dung một cách thông minh."
+
+**[Hiển thị giao diện trò chuyện]**
+"Và đây là trợ lý trò chuyện AI - tôi có thể hỏi 'tóm tắt tất cả email tôi nhận được hôm nay' và nó sẽ trả lời một cách thông minh và chính xác."
+
+---
+
+## 📊 PHẦN 2: TỔNG QUAN QUY TRÌNH XỬ LÝ (3 phút)
+
+"Bây giờ tôi giải thích quy trình hoạt động như thế nào:
+
+1. **Kết nối Gmail qua IMAP** → Lấy dữ liệu email thô
+2. **Xử lý đa tác nhân AI** → 4 tác nhân AI xử lý song song
+3. **Lưu trữ cơ sở dữ liệu** → PostgreSQL với các hàm tùy chỉnh
+4. **Giao diện thời gian thực** → Streaming bằng Server-Sent Events
+
+Đây không phải là luồng công việc tuyến tính đơn giản, mà là hệ thống đa tác nhân phức tạp với khả năng phối hợp thông minh."
+
+---
+
+## 🤖 PHẦN 3: 4 TÁC NHÂN AI CHÍNH (5 phút)
+
+"Hệ thống bao gồm 4 tác nhân AI chuyên biệt:
+
+### 1. Tác nhân Phân loại (Classification Agent)
+- **Nhiệm vụ**: Phân loại email vào 5 danh mục tiếng Việt
+- **Đầu vào**: Tiêu đề + nội dung email
+- **Đầu ra**: Danh mục + điểm tin cậy
+
+### 2. Tác nhân Tóm tắt (Summarization Agent)
+- **Nhiệm vụ**: Tóm tắt email thành 1-2 câu ngắn gọn tiếng Việt
+- **Đầu vào**: Nội dung email
+- **Đầu ra**: Bản tóm tắt tiếng Việt
+
+### 3. Tác nhân Trò chuyện (Chat Agent)
+- **Nhiệm vụ**: Trả lời câu hỏi về email, thực hiện các hành động
+- **Đầu vào**: Tin nhắn người dùng + ngữ cảnh
+- **Đầu ra**: Phản hồi + hành động (tìm kiếm, soạn thảo, điều hướng)
+
+### 4. Tác nhân Soạn thảo (Compose Agent)
+- **Nhiệm vụ**: Hỗ trợ soạn email với ngữ cảnh thông minh
+- **Đầu vào**: Bản thảo + lịch sử hội thoại
+- **Đầu ra**: Nội dung email được đề xuất"
+
+---
+
+## 🔧 PHẦN 4: BA THÀNH PHẦN CỐT LÕI CỦA MỖI TÁC NHÂN (7 phút)
+
+"Mỗi tác nhân được xây dựng với ba thành phần cốt lõi:
+
+### A. MÔ HÌNH CỐT LÕI (Core Model)
+- **Mô hình**: GPT-4o-mini từ OpenAI
+- **Lý do lựa chọn**: Nhanh, tiết kiệm chi phí, đủ thông minh cho tiếng Việt
+- **Cài đặt**: Nhiệt độ từ 0-0.3, giới hạn token được tối ưu hóa
+
+### B. KỸ THUẬT THIẾT KẾ LỆNH (Prompt Engineering)
+
+**Tác nhân Phân loại** *(file: app/api/ai-internal.ts)*
+- Lệnh tiếng Việt native với định dạng: 'Phân loại email vào danh mục phù hợp'
+- Liệt kê tất cả danh mục với mô tả chi tiết
+- Yêu cầu trả về 1-2 danh mục với độ tin cậy >= 0.6
+- Sử dụng JSON Schema để đảm bảo định dạng chính xác
+
+**Tác nhân Tóm tắt** *(file: app/api/ai-internal.ts)*
+- Lệnh: 'Tóm tắt email này thành 1-2 câu ngắn gọn, súc tích bằng tiếng Việt'
+- Giới hạn độ dài để tránh redundancy
+- Tập trung vào thông tin quan trọng nhất
+
+**Tác nhân Trò chuyện** *(file: app/api/ai/route.ts)*
+- Lệnh phức tạp với ngữ cảnh đầy đủ về tình trạng inbox
+- Hiểu được các yêu cầu tiếng Việt như 'tóm tắt tất cả email'
+- Phân biệt được giữa email đã đọc và chưa đọc
+- Trả về hành động cụ thể: navigate, compose, search, sync
+
+**Tác nhân Soạn thảo** *(file: app/api/ai/route.ts)*
+- Lệnh với định dạng đặc biệt sử dụng thẻ <ans> và <mail>
+- Tích hợp ngữ cảnh hội thoại và bản thảo hiện tại
+- Hỗ trợ reply với thông tin email gốc
+
+### C. CÔNG CỤ VÀ TÍCH HỢP (Tools & Integration)
+
+**Cách hoạt động của các công cụ:**
+
+**Gmail IMAP/SMTP** *(file: lib/gmail.ts)*
+- Kết nối trực tiếp đến máy chủ Gmail
+- Đọc cờ email (đã đọc/chưa đọc) từ IMAP
+- Phân tích UTF-8 encoding tùy chỉnh
+- Xử lý MIME content phức tạp
+- Gửi email qua SMTP với Reply-To headers
+
+**Cơ sở dữ liệu PostgreSQL** *(file: lib/db.ts)*
+- Các hàm tùy chỉnh như get_email_summary()
+- Truy vấn JSON aggregation phức tạp
+- Lưu trữ trạng thái đọc/chưa đọc
+- Quản lý assignments cho machine learning
+
+**Streaming UI** *(file: app/api/gmail/stream/route.ts)*
+- Server-Sent Events để cập nhật thời gian thực
+- Keep-alive messages để tránh timeout
+- Progress tracking với batch processing
+- Xử lý lỗi và recovery tự động"
+
+---
+
+## ⚡ PHẦN 5: MÃ NGUỒN VS N8N - TẠI SAO MÃ NGUỒN VƯỢT TRỘI (3 phút)
+
+"Tại sao viết mã nguồn thay vì sử dụng n8n? Ba lý do chính:
+
+### 1. XỬ LÝ NỘI DUNG THÔNG MINH 🧠
+
+**n8n**: Chỉ có thao tác chuỗi cơ bản
+**Mã nguồn của tôi** *(file: app/api/ai-internal.ts, dòng 14-31)*:
+
+**Ví dụ cụ thể**: Hàm `extractImportantContent()` sử dụng regex phức tạp để loại bỏ:
+- `-----Original Message-----` (email reply chains)
+- `Best regards?`, `Thank you`, `Sincerely` (chữ ký)
+- `Sent from my iPhone` (footers tự động)
+- Chỉ giữ lại 3 câu đầu tiên, tối đa 400 ký tự
+
+**Tại sao n8n không làm được**: n8n chỉ có node "Replace" đơn giản, không thể viết thuật toán parsing phức tạp như thế này.
+
+→ **Phân tích thông minh, xử lý MIME, mã hóa UTF-8 tùy chỉnh**
+
+### 2. PHỐI HỢP ĐA TÁC NHÂN 🤝
+
+**n8n**: Các nút tuần tự, không có giao tiếp giữa các tác nhân
+**Mã nguồn của tôi** *(file: app/api/gmail/route.ts, dòng 190-207)*:
+
+**Ví dụ cụ thể**: Khi Classification Agent xác định category với confidence >= 0.75:
+```
+const classification = await callClassifyAgent(emailForAI, categories, assignments);
+if (classification && classification.categories.length > 0) {
+  // Lưu kết quả để học máy
+  await createEmailAssignment({
+    sender_email: imapEmail.from.address,
+    category_id: bestCategory.category_id,
+    confidence_score: bestCategory.confidence
+  });
+}
+```
+
+**Tại sao n8n không làm được**: n8n không thể tạo feedback loop giữa các agent. Một khi workflow chạy xong, không có cách nào để agent này gửi dữ liệu cho agent khác để cải thiện.
+
+→ **Phối hợp tác nhân phức tạp, chia sẻ ngữ cảnh, xử lý dự phòng**
+
+### 3. XỬ LÝ IMAP NÂNG CAO 📧
+
+**n8n**: Bị giới hạn bởi Gmail API cơ bản
+**Mã nguồn của tôi** *(file: lib/gmail.ts, dòng 226-230)*:
+
+**Ví dụ cụ thể**: Đọc trực tiếp IMAP flags để xác định trạng thái email:
+```
+flags: (() => {
+  if (!message.flags) return [];
+  if (Array.isArray(message.flags)) return message.flags;
+  if (message.flags instanceof Set) return Array.from(message.flags);
+  return [];
+})()
+```
+Sau đó kiểm tra `imapEmail.flags.includes('\\Seen')` để biết email đã đọc chưa.
+
+**Tại sao n8n không làm được**: n8n chỉ có thể dùng Gmail API REST, không thể kết nối IMAP trực tiếp để đọc flags, parse MIME, hoặc xử lý UTF-8 encoding phức tạp.
+
+→ **Kiểm soát hoàn toàn việc xử lý email, không bị giới hạn bởi API**
+
+---
+
+## 🎯 KẾT LUẬN
+
+"Ba điểm mạnh này chỉ có thể đạt được khi viết mã nguồn:
+1. **Xử lý Thông minh** - Thuật toán tùy chỉnh cho tiếng Việt
+2. **Phối hợp Đa tác nhân** - Các tác nhân giao tiếp phức tạp
+3. **IMAP Nâng cao** - Kiểm soát hoàn toàn việc xử lý email
+
+n8n phù hợp cho tự động hóa đơn giản, nhưng hệ thống tác nhân AI phức tạp cần mã nguồn!"
+
+**[Mở phiên hỏi đáp]**
