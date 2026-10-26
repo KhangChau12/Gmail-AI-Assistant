@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="vi" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Inbox Assistant — hộp thư Gmail tự sắp xếp</title>
+<meta name="description" content="Ứng dụng Gmail mã nguồn mở chạy trên máy bạn: AI xếp thư vào danh mục, tóm tắt, chỉ ra thư cần xử lý và soạn thư trả lời.">
+<meta property="og:title" content="Inbox Assistant">
+<meta property="og:description" content="Your Gmail, sorted by AI and answered from one place. Open source, runs on your machine.">
+<meta name="theme-color" content="#12151f">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700;12..96,800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<script>
+  // Theme before first paint: saved choice, else the system preference.
+  try {
+    var t = localStorage.getItem('theme');
+    document.documentElement.dataset.theme = t === 'light' || t === 'dark' ? t : matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+  } catch (e) {}
+</script>
+</head>
+<body>
+
+<div class="dotgrid" style="border-bottom: 1px solid var(--line)">
+  <div class="wrap">
+    <header class="top">
+      <a href="#top" class="brand" aria-label="Inbox Assistant">
+        <span class="logo"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7l8 6 8-6"/><rect x="3" y="5" width="18" height="14" rx="3"/></svg></span>
+        <span class="brand-name disp">Inbox Assistant</span>
+      </a>
+      <nav class="menu" aria-label="Trang">
+        <a href="#features" data-i18n="nav.features">Tính năng</a>
+        <a href="#how" data-i18n="nav.how">Cách hoạt động</a>
+        <a href="#privacy" data-i18n="nav.privacy">Quyền riêng tư</a>
+        <a href="#setup" data-i18n="nav.setup">Cài đặt</a>
+      </nav>
+      <div class="toggles">
+        <div class="seg" role="group" aria-label="Language">
+          <button type="button" data-lang="vi" aria-pressed="true">VI</button>
+          <button type="button" data-lang="en" aria-pressed="false">EN</button>
+        </div>
+        <button type="button" class="icon-btn" id="theme" aria-label="Light / dark">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+        </button>
+        <a class="btn btn-primary btn-sm" href="https://github.com/KhangChau12/Gmail-AI-Assistant" data-i18n="cta.download">Tải về miễn phí</a>
+      </div>
+    </header>
+
+    <section id="top" class="hero">
+      <div class="hero-copy">
+        <div class="pill mono" data-i18n="hero.pill">Mã nguồn mở · chạy trên máy bạn</div>
+        <h1 class="disp"><span data-i18n="hero.title1">Hộp thư tự sắp xếp.</span><span class="ai" data-i18n="hero.title2">Bạn chỉ việc trả lời.</span></h1>
+        <p class="lead" data-i18n="hero.lead">Inbox Assistant đọc Gmail giúp bạn: xếp từng thư vào đúng danh mục, tóm tắt trong một câu, chỉ ra thư nào cần xử lý. Muốn trả lời thì cứ nói, AI soạn sẵn ngay trong khung chat.</p>
+        <div class="ctas">
+          <a class="btn btn-primary" href="#setup"><span data-i18n="cta.try">Chạy thử trong 5 phút</span>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </a>
+          <a class="btn btn-ghost" href="https://github.com/KhangChau12/Gmail-AI-Assistant" data-i18n="cta.github">Xem trên GitHub</a>
+        </div>
+        <div class="cmd mono">$ npm install &amp;&amp; npm run dev</div>
+      </div>
+
+      <div class="collage" aria-hidden="true">
+        <div class="card c-cats">
+          <div class="disp" style="font-size: 18px; font-weight: 600; margin-bottom: 12px" data-i18n="mock.categories">Danh mục</div>
+          <div class="grid">
+            <div class="tile"><i style="background: color-mix(in srgb, var(--c1) 18%, transparent)"></i><b data-i18n="cat.work">Công việc</b><small style="color: var(--c1)" data-i18n="mock.new5">5 mới</small></div>
+            <div class="tile"><i style="background: color-mix(in srgb, var(--c6) 18%, transparent)"></i><b data-i18n="cat.school">Học tập</b><small style="color: var(--c6)" data-i18n="mock.new3">3 mới</small></div>
+            <div class="tile"><i style="background: color-mix(in srgb, var(--c3) 18%, transparent)"></i><b data-i18n="cat.finance">Tài chính</b><small style="color: var(--c3)" data-i18n="mock.new1">1 mới</small></div>
+            <div class="tile"><i style="background: color-mix(in srgb, var(--c4) 18%, transparent)"></i><b data-i18n="cat.news">Bản tin</b><small style="color: var(--c4)" data-i18n="mock.new12">12 mới</small></div>
+            <div class="tile"><i style="background: color-mix(in srgb, var(--c5) 18%, transparent)"></i><b data-i18n="cat.notify">Thông báo</b><small style="color: var(--c5)" data-i18n="mock.new7">7 mới</small></div>
+            <div class="tile"><i style="background: color-mix(in srgb, var(--c2) 18%, transparent)"></i><b data-i18n="cat.personal">Cá nhân</b><small style="color: var(--c2)" data-i18n="mock.new2">2 mới</small></div>
+          </div>
+        </div>
+
+        <div class="card c-draft">
+          <div class="row" style="display: flex; gap: 10px; align-items: flex-start"><span class="spark">✦</span><span data-i18n="mock.draftIntro">Mình soạn xong thư trả lời chị Linh rồi, bạn xem nhé:</span></div>
+          <div class="row" style="display: flex; flex-direction: column; gap: 6px">
+            <div style="color: var(--faint); font-size: 13px"><span data-i18n="mock.to">Đến</span> <span class="to-chip">Linh Nguyễn</span></div>
+            <div style="font-weight: 600" data-i18n="mock.subject">Re: Xác nhận lịch kick-off</div>
+            <div style="color: var(--muted)" data-i18n="mock.body">Chào chị Linh, em xác nhận tham gia kick-off thứ Sáu lúc 15:00 ạ. Em sẽ gửi slide trước tối thứ Tư…</div>
+          </div>
+          <div class="row">
+            <span class="tchip on" data-i18n="mock.polite">Lịch sự</span>
+            <span class="tchip" data-i18n="mock.shorter">Ngắn hơn</span>
+            <span class="send" data-i18n="mock.send">Gửi</span>
+          </div>
+        </div>
+
+        <div class="c-toast">
+          <span class="bolt"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9z"/></svg></span>
+          <div><div style="font-weight: 700; font-size: 15px" data-i18n="mock.toast">4 thư cần bạn hôm nay</div><div style="font-size: 13px; color: var(--muted)" data-i18n="mock.toastSub">1 hạn chót · 1 cảnh báo bảo mật</div></div>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<div class="strip">
+  <div class="wrap mono">
+    <span data-i18n="strip.1">Gmail qua IMAP · không cần Google Cloud</span>
+    <span data-i18n="strip.2">OpenAI hoặc mô hình local (Ollama)</span>
+    <span data-i18n="strip.3">Dữ liệu nằm trong SQLite trên máy bạn</span>
+    <span>Tiếng Việt &amp; English</span>
+  </div>
+</div>
+
+<main>
+  <section id="features" class="wrap block">
+    <div class="eyebrow" data-i18n="features.eyebrow">Tính năng</div>
+    <h2 class="big disp" data-i18n="features.title">Ba việc nó làm thay bạn, mỗi sáng.</h2>
+    <div class="features">
+      <article class="card feature">
+        <span class="num mono">01</span>
+        <h3 class="disp" data-i18n="f1.title">Xếp thư vào đúng chỗ</h3>
+        <p data-i18n="f1.body">Mỗi thư mới được đọc một lần, xếp vào danh mục bạn tự đặt, gắn mức ưu tiên và rút ra việc cần làm. Bạn đổi danh mục một lần, thư sau từ người đó tự vào đúng ô.</p>
+        <div class="demo" aria-hidden="true">
+          <div class="demo-row"><i style="background: var(--c1)"></i><span data-i18n="f1.r1">Báo giá thiết kế landing page</span><small style="color: var(--c1)" data-i18n="cat.work">Công việc</small></div>
+          <div class="demo-row"><i style="background: var(--c3)"></i><span data-i18n="f1.r2">Sao kê tài khoản tháng 10</span><small style="color: var(--c3)" data-i18n="cat.finance">Tài chính</small></div>
+          <div class="demo-row"><i style="background: var(--c6)"></i><span data-i18n="f1.r3">Lịch thi học kỳ I</span><small style="color: var(--c6)" data-i18n="cat.school">Học tập</small></div>
+        </div>
+      </article>
+      <article class="card feature">
+        <span class="num mono">02</span>
+        <h3 class="disp" data-i18n="f2.title">Hỏi hộp thư như hỏi người</h3>
+        <p data-i18n="f2.body">“Tuần này ai đang chờ mình trả lời?” — trợ lý tự tìm, đọc và trả lời dựa trên thư thật, kèm thẻ thư để bấm mở ngay.</p>
+        <div class="demo" aria-hidden="true">
+          <div class="bubble" data-i18n="f2.q">Hoá đơn nào chưa thanh toán?</div>
+          <div class="mono" style="font-size: 12px; color: var(--faint)" data-i18n="f2.tool">→ tìm · Tài chính · cần xử lý</div>
+          <div style="font-size: 14px"><span style="color: var(--ai)">✦</span> <span data-i18n="f2.a">Có 1 hoá đơn điện tháng 10, hạn ngày 5/11.</span></div>
+        </div>
+      </article>
+      <article class="card feature">
+        <span class="num mono">03</span>
+        <h3 class="disp" data-i18n="f3.title">Trả lời ngay tại chỗ</h3>
+        <p data-i18n="f3.body">Gợi ý trả lời nhanh dưới mỗi thư, hoặc nói ý chính để AI viết thành thư hoàn chỉnh. Bản nháp sửa trực tiếp, bạn bấm gửi khi đã ưng.</p>
+        <div class="chips" aria-hidden="true">
+          <span data-i18n="f3.c1">Đồng ý 15:00</span>
+          <span data-i18n="f3.c2">Xin dời sang 16:30</span>
+          <span class="ai" data-i18n="f3.c3">✦ Viết bằng AI</span>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section id="how" class="wrap block">
+    <div class="eyebrow" data-i18n="how.eyebrow">Cách hoạt động</div>
+    <h2 class="big disp" data-i18n="how.title">Lần đầu nhập hộp thư. Từ đó chỉ tải thư mới.</h2>
+    <div class="steps">
+      <div class="step"><div class="mono" data-i18n="how.s1">BƯỚC 1</div><b class="disp" data-i18n="how.t1">Chụp nhanh hộp thư</b><p data-i18n="how.p1">Chỉ lấy mã số và trạng thái đã đọc của từng thư — vài byte mỗi thư.</p></div>
+      <div class="step"><div class="mono" data-i18n="how.s2">BƯỚC 2</div><b class="disp" data-i18n="how.t2">Tải thư mới</b><p data-i18n="how.p2">Chỉ tải nội dung những thư chưa có, theo từng lô 25 thư.</p></div>
+      <div class="step"><div class="mono" data-i18n="how.s3">BƯỚC 3</div><b class="disp" data-i18n="how.t3">Khớp trạng thái</b><p data-i18n="how.p3">Đã đọc, gắn sao, lưu trữ hay xoá ở nơi khác đều được cập nhật lại.</p></div>
+      <div class="step hot"><div class="mono" data-i18n="how.s4">BƯỚC 4</div><b class="disp" data-i18n="how.t4">AI đọc một lần</b><p data-i18n="how.p4">Một lần gọi AI cho mỗi thư: danh mục, mức ưu tiên, hạn chót, việc cần làm và một câu tóm tắt.</p></div>
+    </div>
+  </section>
+
+  <section class="keys-band" aria-labelledby="keys-title">
+    <div class="wrap">
+      <div class="copy">
+        <div class="eyebrow" data-i18n="keys.eyebrow">Bàn phím trước tiên</div>
+        <h2 id="keys-title" class="big disp" style="font-size: clamp(32px, 3.6vw, 46px)" data-i18n="keys.title">Dọn hộp thư mà không cần chạm chuột.</h2>
+        <p style="margin: 18px 0 0; color: var(--muted)" data-i18n="keys.body">Di chuyển, lưu trữ, trả lời, gọi trợ lý — mọi thao tác đều có phím tắt. Bấm ⌘K để tìm bất cứ thứ gì.</p>
+      </div>
+      <div class="keys">
+        <div><span class="key">J K</span><span data-i18n="keys.k1">Thư sau / trước</span></div>
+        <div><span class="key">E</span><span data-i18n="keys.k2">Lưu trữ</span></div>
+        <div><span class="key">R</span><span data-i18n="keys.k3">Trả lời</span></div>
+        <div><span class="key" style="color: var(--ai)">⌘ J</span><span data-i18n="keys.k4">Hỏi trợ lý</span></div>
+        <div><span class="key">⌘ K</span><span data-i18n="keys.k5">Bảng lệnh</span></div>
+        <div><span class="key" style="color: var(--accent-ink)">⌘ ↵</span><span data-i18n="keys.k6">Gửi thư</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="privacy" class="wrap block" style="padding-top: 96px">
+    <div class="eyebrow" data-i18n="privacy.eyebrow">Quyền riêng tư</div>
+    <h2 class="big disp" data-i18n="privacy.title">Thư của bạn ở trên máy bạn.</h2>
+    <div class="privacy">
+      <div><b data-i18n="privacy.t1">Không có máy chủ trung gian</b><p data-i18n="privacy.p1">App chạy ở localhost, kết nối thẳng tới Gmail. Toàn bộ dữ liệu nằm trong một file SQLite — xoá file là xoá sạch.</p></div>
+      <div><b data-i18n="privacy.t2">Bạn chọn mô hình AI</b><p data-i18n="privacy.p2">Dùng OpenAI, hoặc trỏ sang mô hình chạy local như Ollama để không thư nào rời khỏi máy.</p></div>
+      <div><b data-i18n="privacy.t3">AI không tự gửi thư</b><p data-i18n="privacy.p3">Mọi thư AI viết đều là bản nháp. Chỉ bạn mới bấm được nút Gửi.</p></div>
+    </div>
+  </section>
+
+  <section id="setup" class="wrap block" style="padding-bottom: 112px">
+    <div class="card setup">
+      <div class="copy">
+        <h2 class="big disp" style="margin: 0; font-size: clamp(32px, 3.6vw, 46px)" data-i18n="setup.title">Chạy thử trong năm phút.</h2>
+        <p style="margin: 16px 0 0; color: var(--muted)" data-i18n="setup.body">Cần Node.js 18+, một Gmail App Password và một OpenAI API key. Không cần tạo database hay tài khoản cloud.</p>
+        <a class="btn btn-primary" style="margin-top: 28px" href="https://github.com/KhangChau12/Gmail-AI-Assistant#readme" data-i18n="setup.cta">Hướng dẫn đầy đủ trên GitHub</a>
+      </div>
+      <div class="term" aria-label="Terminal">
+        <div class="d" aria-hidden="true"><i></i><i></i><i></i></div>
+        <div><span class="p">$</span> git clone https://github.com/KhangChau12/Gmail-AI-Assistant</div>
+        <div><span class="p">$</span> cd Gmail-AI-Assistant &amp;&amp; npm install</div>
+        <div><span class="p">$</span> cp .env.example .env</div>
+        <div class="p" data-i18n="setup.comment"># điền GMAIL_ADDRESS, GMAIL_APP_PASSWORD, OPENAI_API_KEY</div>
+        <div><span class="p">$</span> npm run dev</div>
+        <div class="ok" data-i18n="setup.ready">✓ Sẵn sàng tại http://localhost:3000</div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span><span data-i18n="footer.by">Inbox Assistant · làm bởi</span> <a href="https://github.com/KhangChau12">KhangChau12</a></span>
+    <a href="https://github.com/KhangChau12/Gmail-AI-Assistant" data-i18n="footer.source">Mã nguồn mở trên GitHub</a>
+  </div>
+</footer>
+
+<script src="main.js"></script>
+</body>
+</html>

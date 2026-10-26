@@ -1,0 +1,149 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+ * "Ink & Amber". Colours are RGB triplets so Tailwind can apply opacity (bg-accent/10).
+ * Amber = actions (send, deadlines, primary buttons). Lavender (--ai) = anything the AI produced.
+ * Category colours are palette keys (--c-<key>) so they adapt to the theme.
+ */
+:root,
+[data-theme='dark'] {
+  --bg: 18 21 31;
+  --rail: 14 17 25;
+  --panel: 26 31 45;
+  --elevated: 34 40 57;
+  --line: 42 49 70;
+  --line-strong: 56 65 96;
+  --fg: 236 238 245;
+  --muted: 166 172 193;
+  --faint: 140 147 171;
+  --accent: 255 180 84;
+  --accent-fg: 39 26 5;
+  --accent-ink: 255 194 122;
+  --ai: 154 170 255;
+  --danger: 255 130 112;
+  --success: 111 214 176;
+  --c-indigo: 154 170 255;
+  --c-sky: 124 199 242;
+  --c-mint: 111 214 176;
+  --c-violet: 201 162 255;
+  --c-sand: 233 196 140;
+  --c-coral: 255 144 127;
+  --hover: rgb(255 255 255 / 0.04);
+  --selected: rgb(255 255 255 / 0.06);
+  --shadow-card: inset 0 1px 0 rgb(255 255 255 / 0.04), 0 18px 40px -24px rgb(0 0 0 / 0.7);
+  color-scheme: dark;
+}
+
+[data-theme='light'] {
+  --bg: 243 244 248;
+  --rail: 234 236 242;
+  --panel: 255 255 255;
+  --elevated: 246 247 251;
+  --line: 224 227 236;
+  --line-strong: 201 206 220;
+  --fg: 21 25 37;
+  --muted: 77 84 105;
+  --faint: 98 105 127;
+  --accent: 244 165 60;
+  --accent-fg: 42 27 4;
+  --accent-ink: 152 83 0;
+  --ai: 74 91 212;
+  --danger: 196 71 58;
+  --success: 19 128 90;
+  --c-indigo: 74 91 212;
+  --c-sky: 31 115 168;
+  --c-mint: 19 128 90;
+  --c-violet: 118 70 200;
+  --c-sand: 143 100 23;
+  --c-coral: 196 71 58;
+  --hover: rgb(20 25 40 / 0.04);
+  --selected: rgb(20 25 40 / 0.06);
+  --shadow-card: 0 1px 2px rgb(20 25 40 / 0.05), 0 16px 36px -22px rgb(20 25 40 / 0.22);
+  color-scheme: light;
+}
+
+@layer base {
+  html,
+  body {
+    height: 100%;
+  }
+  body {
+    @apply bg-bg font-sans text-base text-fg antialiased;
+  }
+  ::selection {
+    background: rgb(var(--accent) / 0.3);
+  }
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: rgb(var(--line-strong)) transparent;
+  }
+  :focus-visible {
+    outline: 2px solid rgb(var(--accent) / 0.7);
+    outline-offset: 2px;
+  }
+}
+
+@layer components {
+  .font-display {
+    letter-spacing: -0.02em;
+  }
+  .card {
+    @apply rounded-card border border-line bg-panel shadow-card;
+  }
+  .kbd {
+    @apply inline-flex h-[18px] min-w-[18px] items-center justify-center rounded border border-line-strong px-1 font-mono text-2xs text-faint;
+  }
+  .input {
+    @apply w-full rounded-xl border border-line bg-panel px-3 py-2 text-sm text-fg placeholder:text-faint focus:border-accent/60 focus:outline-none;
+  }
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-3.5 text-sm font-medium transition-colors disabled:opacity-50;
+    min-height: 36px;
+  }
+  .btn-primary {
+    @apply btn bg-accent font-semibold text-accent-fg hover:brightness-105;
+  }
+  .btn-ai {
+    @apply btn bg-ai/15 font-semibold text-ai hover:bg-ai/20;
+  }
+  .btn-ghost {
+    @apply btn text-muted hover:bg-hover hover:text-fg;
+  }
+  .btn-outline {
+    @apply btn border border-line text-muted hover:border-line-strong hover:text-fg;
+  }
+  .chip {
+    @apply inline-flex h-8 items-center gap-1.5 rounded-full border border-line px-3 text-sm text-muted transition-colors hover:border-line-strong hover:text-fg;
+  }
+  .eyebrow {
+    @apply font-mono text-2xs uppercase tracking-[0.08em] text-faint;
+  }
+  /* Rendered markdown in assistant replies. */
+  .prose-chat p {
+    @apply my-2;
+  }
+  .prose-chat ul,
+  .prose-chat ol {
+    @apply my-2 space-y-1.5 pl-5;
+  }
+  .prose-chat ul {
+    @apply list-disc;
+  }
+  .prose-chat ol {
+    @apply list-decimal;
+  }
+  .prose-chat li::marker {
+    @apply text-faint;
+  }
+  .prose-chat strong {
+    @apply font-semibold text-fg;
+  }
+  .prose-chat code {
+    @apply rounded bg-hover px-1 font-mono text-xs;
+  }
+  .prose-chat a {
+    @apply text-ai underline-offset-2 hover:underline;
+  }
+}
