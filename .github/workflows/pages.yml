@@ -1,5 +1,6 @@
 # Publishes the product page in site/ to GitHub Pages.
 # One-time setup: repo Settings → Pages → Source: "GitHub Actions".
+# Runs on pushes that touch site/ or this file; to deploy by hand: Actions → Deploy site → Run workflow.
 name: Deploy site
 
 on:
